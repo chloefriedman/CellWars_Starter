@@ -1,7 +1,7 @@
 /**
  * STUDENT FILE
  *
- * Name: ______________________________
+ * Name: Chloe Friedman
  * AI Code Name: ______________________
  *
  * Strategy Description:
@@ -29,6 +29,24 @@ public class MyAI extends CellAI {
          *   GridFunctions.mostCommonNeighbor -> most common neighboring AI
          *   randomInt(bound)            -> reproducible random integer
          */
-        return new Location(randomInt(grid.getRows()), randomInt(grid.getCols()));
+        int row = 0;
+        int col = 0;
+        for(int r = 0; r < grid.getRows(); r++) {
+            for(int c = 0; c < grid.getCols(); c++) 
+            {
+                
+            }
+        }
+        return new Location(row,col);
+    }
+
+    public static Location offense(Grid grid)
+    {
+
+    }
+
+    public static Location defense(Grid grid)
+    {
+        
     }
 }
