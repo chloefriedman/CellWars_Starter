@@ -7,6 +7,9 @@
  * Strategy Description:
  * Replace this comment with a short explanation of the strategy your AI uses.
  * Your final strategy must be fundamentally different from the sample AIs.
+ * 
+ * 
+ *
  */
 public class MyAI extends CellAI {
 
@@ -29,28 +32,53 @@ public class MyAI extends CellAI {
          *   GridFunctions.mostCommonNeighbor -> most common neighboring AI
          *   randomInt(bound)            -> reproducible random integer
          */
-        int row = 0;
-        int col = 0;
-        for(int r = 0; r < grid.getRows(); r++) {
-            for(int c = 0; c < grid.getCols(); c++) 
-            {
-                
-            }
+        int enemyCount = countEnemyCells(grid);
+        int myCount = countMyCells(grid);
+        if(enemyCount > myCount && attack(grid).getRow() != -1)
+        {
+            return attack(grid);
         }
-        return new Location(row,col);
-    }
-
-    public Location attack(Grid grid)
-    {
-
+        else if(myCount > enemyCount && defend(grid).getRow() != -1)
+        {
+            return defend(grid);
+        }
+        else if(attack(grid).getRow() == -1 && defend(grid).getRow() != -1)
+        {
+            return defend(grid);
+        }
+        else if(attack(grid).getRow() != -1 && defend(grid).getRow() == -1)
+        {
+            return attack(grid);
+        }
+        else
+        {
+            return new Location(randomInt(grid.getRows()), randomInt(grid.getCols()));
+        }
     }
 
     public Location defend(Grid grid)
     {
-        int numKills = 0;
+        if(oneOffSquare(grid).getRow() != -1)        
+        {
+            return oneOffSquare(grid);
+        }
+        else if(beeHive(grid).getRow() != -1)
+        {
+            return beeHive(grid);
+        }
+        else
+        {
+            return new Location(-1,-1);
+        }
+    }
+
+    public Location attack(Grid grid)
+    {
+        int maxNumKills = 1;
+        int currentKills = 0;
+        Location bestLocation = new Location(-1,-1);
         int[][] current = new int[grid.getRows()][grid.getCols()];
         int[][] next = new int[grid.getRows()][grid.getCols()];
-        int[][] compare = new int[grid.getRows()][grid.getCols()];
         for(int i = 0; i < grid.getRows(); i++)
         {
             for(int j = 0; j < grid.getCols(); j++)
@@ -59,6 +87,7 @@ public class MyAI extends CellAI {
                 next[i][j] = grid.getCell(i,j);
             }
         }
+        int startingCount = countEnemyCells(grid);
         for(int i = 0; i < current.length; i++)
         {
             for(int j = 0; j < current[0].length; j++)
@@ -66,23 +95,39 @@ public class MyAI extends CellAI {
                 if(current[i][j] != -1 && current[i][j] != getID())
                 {
                     int mostCommon = GridFunctions.mostCommonNeighbor(i,j,grid);
-                    if(mostCommon != -1 && mostCommon == current[i][j])
+                    if(mostCommon == current[i][j])
                     {
                         next[i][j] = -1;
-                        nextGen(next, grid, new Location(i,j));
+                        next = nextGen(next);
+                        int newCount = countEnemyCells(new Grid(next));
+                        if(newCount < startingCount)
+                        {
+                            currentKills = startingCount - newCount;
+                            if(currentKills > maxNumKills)
+                            {
+                                maxNumKills = currentKills;
+                                bestLocation = new Location(i,j);
+                            }
+                            else
+                            {
+                                next[i][j] = current[i][j];
+                                next = nextGen(next);
+                            }
+                        }
                     }
-                    else
-                    {
-                        next[i][j] = current[i][j];
-                    }
+                
                 }
-                else
-                {
-                    next[i][j] = -1;
-                }
+                
             }
         }
-
+        if(maxNumKills == 1)
+        {
+            return new Location(-1,-1);
+        }
+        else
+        {
+            return bestLocation;
+        }
     }
     public Location oneOffSquare(Grid grid)
     {
@@ -281,13 +326,65 @@ public class MyAI extends CellAI {
         return new Location(-1, -1);
     }
 
-    public void nextGen(int[][] next, Grid grid, Location loc)
+    public int[][] nextGen(int[][] next)
     {
-        Grid updatedGrid = new Grid(next);
-
-        
+        for(int i = 0; i < next.length; i++)
+        {
+            for(int j = 0; j < next[0].length; j++)
+            {
+                if(next[i][j] != -1)
+                {
+                    int neighbors = GridFunctions.getNeighbors(i,j,new Grid(next));
+                    if(neighbors < 2 || neighbors > 3)
+                    {
+                        next[i][j] = -1;
+                    }
+                }
+                else
+                {
+                    int neighbors = GridFunctions.getNeighbors(i,j,new Grid(next));
+                    if(neighbors == 3)
+                    {
+                        next[i][j] = GridFunctions.mostCommonNeighbor(i,j,new Grid(next));
+                    }
+                }
+            }
+        }
+        return next;
         
     }
+
+    public int countEnemyCells(Grid grid)
+    {
+        int count = 0;
+        for(int i = 0; i < grid.getRows(); i++)
+        {
+            for(int j = 0; j < grid.getCols(); j++)
+            {
+                if(grid.getCell(i,j) != -1 && grid.getCell(i,j) != getID())
+                {
+                    count++;
+                }
+            }
+        }
+        return count;
+    }
+    public int countMyCells(Grid grid)
+    {
+        int count = 0;
+        for(int i = 0; i < grid.getRows(); i++)
+        {
+            for(int j = 0; j < grid.getCols(); j++)
+            {
+                if(grid.getCell(i,j) == getID())
+                {
+                    count++;
+                }
+            }
+        }
+        return count;
+    }
+
     
 
 
