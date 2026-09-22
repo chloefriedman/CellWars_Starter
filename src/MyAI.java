@@ -62,6 +62,10 @@ public class MyAI extends CellAI {
         {
             return oneOffSquare(grid);
         }
+        else if(glider(grid).getRow() != -1)
+        {
+            return glider(grid);
+        }
         else if(beeHive(grid).getRow() != -1)
         {
             return beeHive(grid);
@@ -120,7 +124,15 @@ public class MyAI extends CellAI {
                 
             }
         }
-        if(maxNumKills == 1)
+        if(maxNumKills >= 3)
+        {
+            return bestLocation;
+        }
+        else if(overPopSquare(grid).getRow() != -1)
+        {
+            return overPopSquare(grid);
+        }
+        else if(maxNumKills == 1)
         {
             return new Location(-1,-1);
         }
@@ -150,13 +162,13 @@ public class MyAI extends CellAI {
                                     continue;
                                 }
 
-                                if (r >= 0 && c >= 0 && r < grid.getRows() && c < grid.getCols())
+                               else if (r >= 0 && c >= 0 && r < grid.getRows() && c < grid.getCols())
                                 {
                                     if (grid.getCell(r, c) != -1) 
                                     {
                                         if(r == i)
                                         {
-                                            if(r != grid.getRows())
+                                            if(r != grid.getRows()-1)
                                             {
                                                 return new Location(r-1,c);
                                             }
@@ -167,7 +179,7 @@ public class MyAI extends CellAI {
                                         }
                                         else if(c == j)
                                         {
-                                            if(c != grid.getCols())
+                                            if(c != grid.getCols()-1)
                                             {
                                                 return new Location(r,c+1);
                                             }
@@ -227,7 +239,7 @@ public class MyAI extends CellAI {
                                         }
                                         else if(c == j)
                                         {
-                                            if(c != grid.getCols())
+                                            if(c != grid.getCols()-1)
                                             {
                                                 return new Location(r,c+1);
                                             }
@@ -386,9 +398,96 @@ public class MyAI extends CellAI {
     }
 
     
+    public Location glider(Grid grid)
+    {
+        int count = 0;
+        int myID = getID();
+        Location missing = new Location(-1,-1);
+        for(int i = 0; i < grid.getRows()-2; i++)
+        {
+            missing = new Location(-1,-1);
+            for(int j = 0; j < grid.getCols()-2; j++)
+            {
+                if(grid.getCell(i,j) == -1 && grid.getCell(i,j+1) == -1 && grid.getCell(i+1,j+1) == -1 && grid.getCell(i+2,j) ==-1)
+                {
+                    if(grid.getCell(i+1,j) == myID)
+                    {
+                        count++;
+                    }
+                    else
+                    {
+                        missing = new Location(i+1,j);
+                    }
 
+                    if(grid.getCell(i+2,j+1) == myID)
+                    {
+                        count++;
+                    }
+                    else
+                    {
+                        missing = new Location(i+2,j+1);
+                    }
 
+                    if(grid.getCell(i+2,j+2) == myID)
+                    {
+                        count++;
+                    }
+                    else
+                    {
+                        missing = new Location(i+2,j+2);
+                    }
 
+                    if(grid.getCell(i+1,j+2) == myID)
+                    {
+                        count++;
+                    }
+                    else
+                    {
+                        missing = new Location(i+1,j+2);
+                    }
+
+                    if(grid.getCell(i,j+2) == myID)
+                    {
+                        count++;
+                    }
+                    else
+                    {
+                        missing = new Location(i,j+2);
+                    }
+
+                    if(count == 4)
+                    {
+                        return missing;
+                    }
+                }
+                
+            }
+        }
+        return new Location(-1,-1);
+    }
+
+    public Location overPopSquare(Grid grid)
+    {
+        int myID = getID();
+        for(int i = 0; i < grid.getRows() - 1; i++)
+        {
+            for(int j =0; j < grid.getCols() - 1; j++)
+            {
+                if(grid.getCell(i,j) != -1 && grid.getCell(i,j) != myID && grid.getCell(i,j+1) != -1 && grid.getCell(i,j+1) != myID && grid.getCell(i+1,j) != -1 && grid.getCell(i+1,j) != myID && grid.getCell(i+1,j+1) != -1 && grid.getCell(i+1,j+1) != myID)
+                {
+                    if((i + 1) != grid.getRows() - 1)
+                    {
+                        return new Location(i+2,j);
+                    }
+                    else if(i != 0)
+                    {
+                        return new Location(i-1,j);
+                    }
+                }
+            }
+        }
+        return new Location(-1,-1);
+    }
 
     
 }
