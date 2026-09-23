@@ -190,11 +190,25 @@ public class MyAI extends CellAI {
                                         }
                                         else if(c > j)
                                         {
-                                            return new Location(r,c+1);
+                                            if(c < grid.getCols() -1)
+                                            {
+                                                return new Location(r,c+1);
+                                            }
+                                            else
+                                            {
+                                                return new Location(r,c-1);
+                                            }
                                         }
                                         else
                                         {
-                                            return new Location(r,c-1);
+                                            if(c > 0)
+                                            {
+                                                return new Location(r,c-1);
+                                            }
+                                            else
+                                            {
+                                                return new Location(r,c+1);
+                                            }
                                         }
                                     
                                     }
@@ -222,13 +236,13 @@ public class MyAI extends CellAI {
                                     continue;
                                 }
 
-                                if (r >= 0 && c >= 0 && r < grid.getRows() && c < grid.getCols())
+                                else if (r >= 0 && c >= 0 && r < grid.getRows() && c < grid.getCols())
                                 {
                                     if (grid.getCell(r, c) != -1) 
                                     {
                                         if(r == i)
                                         {
-                                            if(r != grid.getRows())
+                                            if(r != grid.getRows()-1)
                                             {
                                                 return new Location(r-1,c);
                                             }
@@ -250,11 +264,25 @@ public class MyAI extends CellAI {
                                         }
                                         else if(c > j)
                                         {
-                                            return new Location(r,c+1);
+                                            if(c < grid.getCols() -1)
+                                            {
+                                                return new Location(r,c+1);
+                                            }
+                                            else
+                                            {
+                                                return new Location(r,c-1);
+                                            }
                                         }
                                         else
                                         {
-                                            return new Location(r,c-1);
+                                            if(c > 0)
+                                            {
+                                                return new Location(r,c-1);
+                                            }
+                                            else
+                                            {
+                                                return new Location(r,c+1);
+                                            }
                                         }
                                     
                                     }
@@ -294,7 +322,7 @@ public class MyAI extends CellAI {
                     }
                     else
                     {
-                        missing = new Location(i,j-1);
+                        missing = new Location(i,j+2);
                     }
                     if(grid.getCell(i+1,j) == myID)
                     {
@@ -475,7 +503,7 @@ public class MyAI extends CellAI {
             {
                 if(grid.getCell(i,j) != -1 && grid.getCell(i,j) != myID && grid.getCell(i,j+1) != -1 && grid.getCell(i,j+1) != myID && grid.getCell(i+1,j) != -1 && grid.getCell(i+1,j) != myID && grid.getCell(i+1,j+1) != -1 && grid.getCell(i+1,j+1) != myID)
                 {
-                    if((i + 1) != grid.getRows() - 1)
+                    if(i != grid.getRows() - 2)
                     {
                         return new Location(i+2,j);
                     }
