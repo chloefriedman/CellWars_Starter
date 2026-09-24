@@ -13,7 +13,7 @@
  * 
  *
  */
-public class MyAI extends CellAI {
+public class unicornAI extends CellAI {
 
     @Override
     public String getAIName() {
