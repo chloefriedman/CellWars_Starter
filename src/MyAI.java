@@ -5,8 +5,10 @@
  * AI Code Name: unicornAI
  *
  * Strategy Description:
- * Replace this comment with a short explanation of the strategy your AI uses.
- * Your final strategy must be fundamentally different from the sample AIs.
+ *unicornAI asseses if it has more cells than the enemy and if it does it will focus on killing enemy cells. If it has less cells than the enemy, unicornAI will focus on defending its own cells. If it has the same amount of cells as the enemy, unicornAI will focus on killing enemy cells.
+  unicornAI will kill cells by looking for patterns including oscillators and squares to be overpopulated. If there are none, unicornAI will suggest that the AI should kill the cell that will kill the most enemy cells in the next generation
+ unicornAI expands by looking for patterns including squares, beehives, and gliders to create. If there are none, unicornAI suggests that the AI should kill cells instead
+ if both the attack and defend methods return a location of -1, -1 (no patterns or opportunities), unicornAI will suggest that the AI should place a cell in a random location
  * 
  * 
  *
@@ -34,11 +36,11 @@ public class MyAI extends CellAI {
          */
         int enemyCount = countEnemyCells(grid);
         int myCount = countMyCells(grid);
-        if(enemyCount > myCount && attack(grid).getRow() != -1)
+        if(enemyCount < myCount && attack(grid).getRow() != -1)
         {
             return attack(grid);
         }
-        else if(myCount > enemyCount && defend(grid).getRow() != -1)
+        else if(myCount < enemyCount && defend(grid).getRow() != -1)
         {
             return defend(grid);
         }
@@ -49,6 +51,14 @@ public class MyAI extends CellAI {
         else if(attack(grid).getRow() != -1 && defend(grid).getRow() == -1)
         {
             return attack(grid);
+        }
+        else if(myCount == enemyCount && attack(grid).getRow() != -1)
+        {
+            return attack(grid);
+        }
+        else if (myCount == enemyCount && defend(grid).getRow() != -1)
+        {
+            return defend(grid);
         }
         else
         {
@@ -124,9 +134,13 @@ public class MyAI extends CellAI {
                 
             }
         }
-        if(maxNumKills >= 3)
+        if(maxNumKills > 3)
         {
             return bestLocation;
+        }
+        else if(killOsc(grid).getRow() != -1)
+        {
+            return killOsc(grid);
         }
         else if(overPopSquare(grid).getRow() != -1)
         {
@@ -168,7 +182,7 @@ public class MyAI extends CellAI {
                                     {
                                         if(r == i)
                                         {
-                                            if(r != grid.getRows()-1)
+                                            if(r != grid.getRows()-2)
                                             {
                                                 return new Location(r-1,c);
                                             }
@@ -179,7 +193,7 @@ public class MyAI extends CellAI {
                                         }
                                         else if(c == j)
                                         {
-                                            if(c != grid.getCols()-1)
+                                            if(c != grid.getCols()-2)
                                             {
                                                 return new Location(r,c+1);
                                             }
@@ -242,7 +256,7 @@ public class MyAI extends CellAI {
                                     {
                                         if(r == i)
                                         {
-                                            if(r != grid.getRows()-1)
+                                            if(r != grid.getRows()-2)
                                             {
                                                 return new Location(r-1,c);
                                             }
@@ -253,7 +267,7 @@ public class MyAI extends CellAI {
                                         }
                                         else if(c == j)
                                         {
-                                            if(c != grid.getCols()-1)
+                                            if(c != grid.getCols()-2)
                                             {
                                                 return new Location(r,c+1);
                                             }
@@ -264,7 +278,7 @@ public class MyAI extends CellAI {
                                         }
                                         else if(c > j)
                                         {
-                                            if(c < grid.getCols() -1)
+                                            if(c < grid.getCols() -2)
                                             {
                                                 return new Location(r,c+1);
                                             }
@@ -300,9 +314,9 @@ public class MyAI extends CellAI {
     public Location beeHive(Grid grid)
     {
         int myID = getID();
-        for(int i = 0; i < grid.getRows()-2; i++)
+        for(int i = 0; i < grid.getRows()-3; i++)
         {
-            for(int j = 0; j < grid.getCols()-3; j++)
+            for(int j = 0; j < grid.getCols()-4; j++)
             {
                 int count = 0;
                 Location missing = new Location(-1,-1);
@@ -497,13 +511,13 @@ public class MyAI extends CellAI {
     public Location overPopSquare(Grid grid)
     {
         int myID = getID();
-        for(int i = 0; i < grid.getRows() - 1; i++)
+        for(int i = 0; i < grid.getRows() - 2; i++)
         {
             for(int j =0; j < grid.getCols() - 1; j++)
             {
                 if(grid.getCell(i,j) != -1 && grid.getCell(i,j) != myID && grid.getCell(i,j+1) != -1 && grid.getCell(i,j+1) != myID && grid.getCell(i+1,j) != -1 && grid.getCell(i+1,j) != myID && grid.getCell(i+1,j+1) != -1 && grid.getCell(i+1,j+1) != myID)
                 {
-                    if(i != grid.getRows() - 2)
+                    if(i != grid.getRows() - 3)
                     {
                         return new Location(i+2,j);
                     }
@@ -511,6 +525,32 @@ public class MyAI extends CellAI {
                     {
                         return new Location(i-1,j);
                     }
+                }
+            }
+        }
+        return new Location(-1,-1);
+    }
+
+    public Location killOsc(Grid grid)
+    {
+        int myID = getID();
+        for(int i = 0; i < grid.getRows(); i++)
+        {
+            for(int j = 0; j < grid.getCols() -3; j++)
+            {
+                if(grid.getCell(i,j) != -1 && grid.getCell(i,j) != myID && grid.getCell(i,j+1) != -1 && grid.getCell(i,j+1) != myID && grid.getCell(i,j+2) != -1 && grid.getCell(i,j+2) != myID)
+                {
+                    return new Location(i,j);
+                }
+            }
+        }
+        for(int i = 0; i < grid.getRows() -3; i++)
+        {
+            for(int j = 0; j < grid.getCols(); j++)
+            {
+                if(grid.getCell(i,j) != -1 && grid.getCell(i,j) != myID && grid.getCell(i+1,j) != -1 && grid.getCell(i+1,j) != myID && grid.getCell(i+2,j) != -1 && grid.getCell(i+2,j) != myID)
+                {
+                    return new Location(i,j);
                 }
             }
         }
