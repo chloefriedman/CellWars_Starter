@@ -5,7 +5,7 @@
  * AI Code Name: unicornAI
  *
  * Strategy Description:
- *unicornAI asseses if it has more cells than the enemy and if it does it will focus on killing enemy cells. If it has less cells than the enemy, unicornAI will focus on defending its own cells. If it has the same amount of cells as the enemy, unicornAI will focus on killing enemy cells.
+ *unicornAI assesses if it has more cells than the enemy and if it does it will focus on killing enemy cells. If it has less cells than the enemy, unicornAI will focus on defending its own cells. If it has the same amount of cells as the enemy, unicornAI will focus on killing enemy cells.
   unicornAI will kill cells by looking for patterns including oscillators and squares to be overpopulated. If there are none, unicornAI will suggest that the AI should kill the cell that will kill the most enemy cells in the next generation
  unicornAI expands by looking for patterns including squares, beehives, and gliders to create. If there are none, unicornAI suggests that the AI should kill cells instead
  if both the attack and defend methods return a location of -1, -1 (no patterns or opportunities), unicornAI will suggest that the AI should place a cell in a random location
